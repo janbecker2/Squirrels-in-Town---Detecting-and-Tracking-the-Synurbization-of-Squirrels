@@ -6,7 +6,9 @@ import cv2 as cv
 model = YOLO(r"runs/detect/squirrel_yolo11/weights/best.pt")
 
 # Load video
-video_path = r"D:\squirrel_vid_short.mp4"
+# video_path = r"D:\squirrel_vid_short.mp4"
+#video_path = r"C:\Users\job02\Documents\Squirrel_Videos\20241107_TrepS_01_in (5).MOV"
+video_path = r"C:\Users\job02\Downloads\squirrel_vid_short.mp4"
 cap = cv.VideoCapture(video_path)
 
 while True:

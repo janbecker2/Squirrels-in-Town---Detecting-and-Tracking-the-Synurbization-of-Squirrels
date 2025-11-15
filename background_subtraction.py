@@ -13,8 +13,8 @@ def readVideo_BGSub(videoName):
         return
 
     # Initialize both Background Subtractors
-    backSub_KNN = cv.createBackgroundSubtractorKNN(detectShadows=True) 
-    backSub_MOG2 = cv.createBackgroundSubtractorMOG2(detectShadows=True)
+    #backSub_KNN = cv.createBackgroundSubtractorKNN(detectShadows=True) 
+    backSub_MOG2 = cv.createBackgroundSubtractorMOG2(history = 500, varThreshold= 32)
 
     scale = 0.5
     differences_knn = []
@@ -31,18 +31,18 @@ def readVideo_BGSub(videoName):
             frame = cv.resize(frame, (0, 0), fx=scale, fy=scale)
 
         # Apply both background subtraction methods
-        fgMask_KNN = backSub_KNN.apply(frame)
+        #fgMask_KNN = backSub_KNN.apply(frame)
         fgMask_MOG2 = backSub_MOG2.apply(frame)
 
         # Count motion pixels for both
-        count_knn = np.sum(fgMask_KNN > 0)
+        #count_knn = np.sum(fgMask_KNN > 0)
         count_mog2 = np.sum(fgMask_MOG2 > 0)
-        differences_knn.append(count_knn)
+        #differences_knn.append(count_knn)
         differences_mog2.append(count_mog2)
 
-        # cv.imshow("Original Frame", frame)
-        # cv.imshow("KNN Foreground Mask", fgMask_KNN)
-        # cv.imshow("MOG2 Foreground Mask", fgMask_MOG2)
+        #cv.imshow("Original Frame", frame)
+        #cv.imshow("KNN Foreground Mask", fgMask_KNN)
+        #cv.imshow("MOG2 Foreground Mask", fgMask_MOG2)
         
         key = cv.waitKey(1)  
 
@@ -57,19 +57,22 @@ def readVideo_BGSub(videoName):
     return differences_knn, differences_mog2
 
 # Run
-diffs_knn, diffs_mog2 = readVideo_BGSub(r"D:\squirrel_vid_short.mp4")
+# video_path = r"C:\Users\job02\Downloads\squirrel_vid_short.mp4"
+diffs_knn, diffs_mog2 = readVideo_BGSub(r"C:\Users\job02\Downloads\squirrel_vid_short.mp4")
+
+#diffs_knn, diffs_mog2 = readVideo_BGSub(r"D:\squirrel_vid_short.mp4")
 
 # Plot both methods side by side for comparison
 plt.figure(figsize=(12, 5))
 
 # --- KNN ---
-plt.subplot(1, 2, 1)
-plt.plot(diffs_knn, label='KNN', color='blue')
-plt.xlabel('Frame Number')
-plt.ylabel('Motion Pixels')
-plt.title('KNN Background Subtraction')
-plt.grid(True)
-plt.legend()
+# plt.subplot(1, 2, 1)
+# plt.plot(diffs_knn, label='KNN', color='blue')
+# plt.xlabel('Frame Number')
+# plt.ylabel('Motion Pixels')
+# plt.title('KNN Background Subtraction')
+# plt.grid(True)
+# plt.legend()
 
 # --- MOG2 ---
 plt.subplot(1, 2, 2)
