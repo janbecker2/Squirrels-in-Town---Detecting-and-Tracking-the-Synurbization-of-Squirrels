@@ -4,10 +4,54 @@ import numpy as np
 import time
 
 
-Entry_ROI = (910, 100, 1100, 300)
+def detect_entry_position(videoName, min_radius=20, max_radius=100):
+    cap = cv.VideoCapture(videoName)
+    if not cap.isOpened():
+        print("Fehler beim Öffnen des Videos")
+        return None
 
-def ses_classify_video(videoName):
-    print("▶ Start Reading Video")
+    entry_circle = None
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        blur = cv.medianBlur(gray, 5)
+
+        circles = cv.HoughCircles(
+            blur,
+            cv.HOUGH_GRADIENT,
+            dp=1.2,
+            minDist=50,
+            param1=50,
+            param2=30,
+            minRadius=min_radius,
+            maxRadius=max_radius
+        )
+
+        if circles is not None:
+            circles = np.uint16(np.around(circles))
+            entry_circle = max(circles[0, :], key=lambda c: c[2])
+            break  
+
+    cap.release()
+
+    if entry_circle is not None:
+        x, y, r = entry_circle
+        x1, y1 = int(x - r), int(y - r)
+        x2, y2 = int(x + r), int(y + r)
+        return (x1, y1, x2, y2)
+    else:
+        return None
+
+    
+def detect_entry_state(videoName):
+    entry_ROI = (910, 100, 1100, 300)
+    # entry_ROI = detect_entry_position(video_path)
+    # print(entry_ROI)
+    print("Start Reading Video")
     cap = cv.VideoCapture(videoName)
 
     if not cap.isOpened():
@@ -23,7 +67,7 @@ def ses_classify_video(videoName):
     first_full_frame = None
 
 
-    sx1, sy1, sx2, sy2 = [int(v * scale) for v in Entry_ROI]
+    sx1, sy1, sx2, sy2 = [int(v * scale) for v in entry_ROI]
     ENTRY = (sx1, sy1, sx2, sy2)
     ENTRY_AREA = (sx2 - sx1) * (sy2 - sy1)
     
@@ -62,7 +106,7 @@ def ses_classify_video(videoName):
            
             timeline.append(state)
             frame_count += 1
-            print(f"Frame {frame_count:4d} | full={full_pixels:.3f} | entry={entry_pixels:.3f} | similarity={similarity:.3f} | state {state}")
+            print(f"Frame {frame_count} | full={full_pixels} | entry={entry_pixels} | similarity={similarity} | state {state}")
 
 
             x1, y1, x2, y2 = ENTRY
@@ -95,7 +139,7 @@ def ses_classify_video(videoName):
 video_path = r"C:\Users\Jan\Downloads\20241107_TrepS_01_in (2)_cut.mp4"
 #video_path = r"D:\squirrel_vid_short.mp4"
 
-timeline = ses_classify_video(video_path)
+timeline = detect_entry_state(video_path)
 
 plt.figure(figsize=(10,4))
 plt.plot(timeline, label="SES state")
