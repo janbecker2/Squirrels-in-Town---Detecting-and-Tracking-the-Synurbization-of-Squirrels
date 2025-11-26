@@ -46,10 +46,7 @@ def ses_classify_video(videoName):
             full_pixels  = np.sum(mask > 0)
             entry_pixels = np.sum(mask[sy1:sy2, sx1:sx2] > 0)
 
-            full_ratio  = full_pixels / frame_area
-            entry_ratio = entry_pixels / ENTRY_AREA if ENTRY_AREA else 0
-
-            similarity = entry_pixels / full_pixels if full_pixels else 0
+            similarity = entry_pixels / full_pixels 
 
             if similarity > 0.8 and full_pixels < 5000: 
                 state = 1 # Head State
@@ -62,23 +59,10 @@ def ses_classify_video(videoName):
             else:
                 state = 0
 
-            # if similarity > 0.8:
-            #     state = 1  # Head 
-            # elif 0.001 < full_ratio < 0.05:
-            #     state = 2  # Partial
-            #     ever_partial = True
-            # elif full_ratio >= 0.05:
-            #     state = 3  # Full
-            #     ever_full = True
-            #     if first_full_frame is None:
-            #         first_full_frame = frame_count
-            # else:
-            #     state = 0  
-
+           
             timeline.append(state)
             frame_count += 1
-            print(f"Frame {frame_count:4d} | full={full_pixels:.3f} | entry={entry_pixels:.3f}")
-            print(f"Frame {frame_count:4d} | full={full_ratio:.3f} | entry={entry_ratio:.3f} | similarity={similarity:.3f} → state {state}")
+            print(f"Frame {frame_count:4d} | full={full_pixels:.3f} | entry={entry_pixels:.3f} | similarity={similarity:.3f} | state {state}")
 
 
             x1, y1, x2, y2 = ENTRY
@@ -92,12 +76,6 @@ def ses_classify_video(videoName):
 
             #cv.imshow("Foreground Mask (Full Frame)", mask)
             #cv.imshow("Entry Mask (ENTRY ROI)", mask[sy1:sy2, sx1:sx2])
-
-            debug = mask.copy()
-            cv.putText(debug, f"Similarity: {similarity:.2f}", (30, 80),
-                    cv.FONT_HERSHEY_SIMPLEX, 1.0, 2)
-            cv.imshow("Mask Similarity Debug", debug)
-
             cv.imshow("SES Detection", frame)
 
         key = cv.waitKey(30)
@@ -115,6 +93,8 @@ def ses_classify_video(videoName):
 
 
 video_path = r"C:\Users\Jan\Downloads\20241107_TrepS_01_in (2)_cut.mp4"
+#video_path = r"D:\squirrel_vid_short.mp4"
+
 timeline = ses_classify_video(video_path)
 
 plt.figure(figsize=(10,4))
