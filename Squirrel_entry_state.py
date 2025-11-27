@@ -48,7 +48,7 @@ def detect_entry_position(videoName, min_radius=20, max_radius=100):
 
     
 def detect_entry_state(videoName):
-    entry_ROI = (910, 100, 1100, 300)
+    entry_ROI = (910, 100, 1100, 270)
     # entry_ROI = detect_entry_position(video_path)
     # print(entry_ROI)
     print("Start Reading Video")
@@ -58,7 +58,7 @@ def detect_entry_state(videoName):
         print("Error: Could not open video")
         return None, []
 
-    backSub = cv.createBackgroundSubtractorMOG2(history=500, varThreshold=32)
+    backSub = cv.createBackgroundSubtractorMOG2(history=700, varThreshold=32)
     scale = 1.0
     frame_count = 0
     timeline = []
@@ -69,7 +69,6 @@ def detect_entry_state(videoName):
 
     sx1, sy1, sx2, sy2 = [int(v * scale) for v in entry_ROI]
     ENTRY = (sx1, sy1, sx2, sy2)
-    ENTRY_AREA = (sx2 - sx1) * (sy2 - sy1)
     
     paused = False
     while True:
@@ -79,8 +78,6 @@ def detect_entry_state(videoName):
                 break
 
             frame = cv.resize(frame, (0, 0), fx=scale, fy=scale)
-            h, w, _ = frame.shape
-            frame_area = w * h
 
             # Background subtraction 
             fgMask = backSub.apply(frame)
@@ -92,9 +89,9 @@ def detect_entry_state(videoName):
 
             similarity = entry_pixels / full_pixels 
 
-            if similarity > 0.8 and full_pixels < 5000: 
+            if  0.7 < similarity and full_pixels < 5000 and entry_pixels < 4000: 
                 state = 1 # Head State
-            elif  5000 < full_pixels < 20000:
+            elif full_pixels < 20000 and full_pixels > 4000:
                 state = 2  # Partial State
             elif full_pixels >= 20000:
                 state = 3  # Full State
@@ -136,7 +133,8 @@ def detect_entry_state(videoName):
     return timeline
 
 
-video_path = r"C:\Users\Jan\Downloads\20241107_TrepS_01_in (2)_cut.mp4"
+#video_path = r"C:\Users\Jan\Downloads\20241107_TrepS_01_in (2)_cut.mp4"
+video_path = r"C:\Users\job02\Documents\Squirrel_Videos\20241107_TrepS_01_in (2)_cut.mp4"
 #video_path = r"D:\squirrel_vid_short.mp4"
 
 timeline = detect_entry_state(video_path)
