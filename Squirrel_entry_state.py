@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
-
 def detect_entry_position(videoName, min_radius=20, max_radius=100):
     cap = cv.VideoCapture(videoName)
     if not cap.isOpened():
@@ -103,8 +102,6 @@ def detect_entry_state(videoName):
                 state = 2  # Partial State
             elif full_pixels >= 20000:
                 state = 3  # Full State
-                if first_full_frame is None:
-                    first_full_frame = frame_count
             else:
                 state = 0
 
