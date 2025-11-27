@@ -63,6 +63,15 @@ def detect_entry_state(videoName):
     frame_count = 0
     timeline = []
 
+    fps = cap.get(cv.CAP_PROP_FPS)
+    width  = int(cap.get(cv.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
+    max_frames = int(fps * 20)  
+
+    # prepare writer
+    fourcc = cv.VideoWriter_fourcc(*"mp4v")
+    out = cv.VideoWriter(r"C:\Users\job02\Downloads\test.mp4", fourcc, fps, (width, height))
+
  
     first_full_frame = None
 
@@ -79,6 +88,7 @@ def detect_entry_state(videoName):
 
             frame = cv.resize(frame, (0, 0), fx=scale, fy=scale)
 
+            
             # Background subtraction 
             fgMask = backSub.apply(frame)
             mask = cv.threshold(fgMask, 200, 255, cv.THRESH_BINARY)[1]
@@ -89,9 +99,9 @@ def detect_entry_state(videoName):
 
             similarity = entry_pixels / full_pixels 
 
-            if  0.7 < similarity and full_pixels < 5000 and entry_pixels < 4000: 
+            if  0.7 < similarity and full_pixels < 5000: 
                 state = 1 # Head State
-            elif full_pixels < 20000 and full_pixels > 4000:
+            elif full_pixels < 20000 and full_pixels > 5000 and entry_pixels > 2000:
                 state = 2  # Partial State
             elif full_pixels >= 20000:
                 state = 3  # Full State
@@ -117,8 +127,10 @@ def detect_entry_state(videoName):
 
             #cv.imshow("Foreground Mask (Full Frame)", mask)
             #cv.imshow("Entry Mask (ENTRY ROI)", mask[sy1:sy2, sx1:sx2])
-            cv.imshow("SES Detection", frame)
+            #cv.imshow("State Detection", frame
 
+            out.write(frame) 
+            
         key = cv.waitKey(30)
 
         if key == 27:  # ESC
@@ -127,6 +139,7 @@ def detect_entry_state(videoName):
             paused = not paused
 
     cap.release()
+    out.release()
     cv.destroyAllWindows()
     print(f"Frames processed: {frame_count}")
 
