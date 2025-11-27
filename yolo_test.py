@@ -1,17 +1,22 @@
 from ultralytics import YOLO
 import cv2 as cv
 
-
-#model = YOLO('yolo11n.pt') 
 model = YOLO(r"runs/detect/squirrel_yolo11/weights/best.pt")
-
-# Load video
-# video_path = r"D:\squirrel_vid_short.mp4"
-#video_path = r"C:\Users\job02\Documents\Squirrel_Videos\20241107_TrepS_01_in (5).MOV"
 video_path = r"C:\Users\job02\Downloads\squirrel_vid_short.mp4"
-cap = cv.VideoCapture(video_path)
+output_path = r"C:\Users\job02\Downloads\squirrel_yolo_output.mp4"
 
-while True:
+cap = cv.VideoCapture(video_path)
+fps = cap.get(cv.CAP_PROP_FPS)
+width = int(cap.get(cv.CAP_PROP_FRAME_WIDTH))
+height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
+
+fourcc = cv.VideoWriter_fourcc(*"mp4v")
+out = cv.VideoWriter(output_path, fourcc, fps, (width, height))
+
+max_frames = int(fps * 30)
+frame_count = 0
+
+while frame_count < max_frames:
     ret, frame = cap.read()
     if not ret:
         break
@@ -19,19 +24,16 @@ while True:
     results = model(frame, conf=0.5)
 
     for r in results:
-        img_with_boxes = r.plot()  # Draw boxes on the frame
+        frame = r.plot()
 
-        print(f"\n Found {len(r.boxes)} objects in this frame")
-        for i, box in enumerate(r.boxes):
-            class_id = int(box.cls)
-            confidence = float(box.conf)
-            class_name = model.names[class_id]
-            print(f"  {i+1}. {class_name} ({confidence:.1%} confidence)")
+    out.write(frame)
 
-        cv.imshow('YOLO Detection', img_with_boxes)
-
+    #cv.imshow('YOLO Detection', frame)
     if cv.waitKey(1) & 0xFF == ord('q'):
         break
 
+    frame_count += 1
+
 cap.release()
+out.release()
 cv.destroyAllWindows()
