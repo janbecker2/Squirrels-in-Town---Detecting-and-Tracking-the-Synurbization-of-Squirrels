@@ -63,21 +63,19 @@ def detect_entry_state(videoName):
     frame_count = 0
     timeline = []
 
-    fps = cap.get(cv.CAP_PROP_FPS)
-    width  = int(cap.get(cv.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
-    max_frames = int(fps * 20)  
-
-    # prepare writer
-    fourcc = cv.VideoWriter_fourcc(*"mp4v")
-    out = cv.VideoWriter(r"C:\Users\job02\Downloads\test.mp4", fourcc, fps, (width, height))
+    # fps = cap.get(cv.CAP_PROP_FPS)
+    # width  = int(cap.get(cv.CAP_PROP_FRAME_WIDTH))
+    # height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
+    # max_frames = int(fps * 20)  
+    # fourcc = cv.VideoWriter_fourcc(*"mp4v")
+    # out = cv.VideoWriter(r"C:\Users\job02\Downloads\test.mp4", fourcc, fps, (width, height))
 
  
     first_full_frame = None
 
 
     sx1, sy1, sx2, sy2 = [int(v * scale) for v in entry_ROI]
-    ENTRY = (sx1, sy1, sx2, sy2)
+    entry = (sx1, sy1, sx2, sy2)
     
     paused = False
     while True:
@@ -116,9 +114,9 @@ def detect_entry_state(videoName):
             print(f"Frame {frame_count} | full={full_pixels} | entry={entry_pixels} | similarity={similarity} | state {state}")
 
 
-            x1, y1, x2, y2 = ENTRY
+            x1, y1, x2, y2 = entry
             cv.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            cv.putText(frame, "ENTRY ROI", (x1, y1 - 15),
+            cv.putText(frame, "entry ROI", (x1, y1 - 15),
                     cv.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
 
             labels = ["NONE", "HEAD", "PARTIAL", "FULL"]
@@ -126,20 +124,20 @@ def detect_entry_state(videoName):
                     cv.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
 
             #cv.imshow("Foreground Mask (Full Frame)", mask)
-            #cv.imshow("Entry Mask (ENTRY ROI)", mask[sy1:sy2, sx1:sx2])
-            #cv.imshow("State Detection", frame
+            #cv.imshow("entry Mask (entry ROI)", mask[sy1:sy2, sx1:sx2])
+            cv.imshow("State Detection", frame)
 
-            out.write(frame) 
-            
+            #out.write(frame) 
+
         key = cv.waitKey(30)
 
-        if key == 27:  # ESC
+        if key == 27:  
             break
         if key in (ord('p'), ord('P')):  # toggle pause
             paused = not paused
 
     cap.release()
-    out.release()
+    # out.release()
     cv.destroyAllWindows()
     print(f"Frames processed: {frame_count}")
 
@@ -153,10 +151,10 @@ video_path = r"C:\Users\job02\Documents\Squirrel_Videos\20241107_TrepS_01_in (2)
 timeline = detect_entry_state(video_path)
 
 plt.figure(figsize=(10,4))
-plt.plot(timeline, label="SES state")
+plt.plot(timeline, label="entry state")
 plt.yticks([0,1,2,3], ["none","head","partial","full"])
 plt.xlabel("Frame")
-plt.ylabel("SES State")
+plt.ylabel("entry State")
 plt.grid(True)
 plt.legend()
 plt.show()
