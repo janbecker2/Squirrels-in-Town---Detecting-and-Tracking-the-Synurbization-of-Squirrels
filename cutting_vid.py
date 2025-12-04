@@ -82,5 +82,5 @@ def cut_videos_in_folder(folder, motion_threshold=5000, scale=0.5):
 cut_videos_in_folder(
     r"C:\Users\job02\Documents\Squirrel_Videos",  
     motion_threshold=5000,
-    scale=0.5
+    scale=1.0
 )

@@ -1,6 +1,14 @@
 from ultralytics import YOLO
 import cv2 as cv
 
+# model.train( 
+# data=r"D:\squirrel.v1i.yolov11\data.yaml", 
+# epochs=100, 
+# imgsz=640, 
+# batch=16, 
+# name="squirrel_yolo11" 
+# )
+
 model = YOLO(r"runs/detect/squirrel_yolo11/weights/best.pt")
 video_path = r"C:\Users\job02\Downloads\squirrel_vid_short.mp4"
 output_path = r"C:\Users\job02\Downloads\squirrel_yolo_output.mp4"
@@ -28,7 +36,7 @@ while frame_count < max_frames:
 
     out.write(frame)
 
-    #cv.imshow('YOLO Detection', frame)
+    cv.imshow('YOLO Detection', frame)
     if cv.waitKey(1) & 0xFF == ord('q'):
         break
 
