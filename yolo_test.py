@@ -22,22 +22,30 @@ height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
 fourcc = cv.VideoWriter_fourcc(*"mp4v")
 out = cv.VideoWriter(output_path, fourcc, fps, (width, height))
 
-max_frames = int(fps * 30)
+#max_frames = int(fps * 30)
 frame_count = 0
 
-while frame_count < max_frames:
+#while frame_count < max_frames:
+while True:
     ret, frame = cap.read()
     if not ret:
         break
 
-    results = model(frame, conf=0.5)
+    results = model(frame, conf=0.3)
 
-    for r in results:
-        frame = r.plot()
+    # Always start with the original frame
+    output_frame = frame.copy()
 
-    out.write(frame)
+    # Draw detections only if present
+    if len(results) > 0:
+        output_frame = results[0].plot()
 
-    #cv.imshow('YOLO Detection', frame)
+    # Write every frame
+    out.write(output_frame)
+
+    # Debug:
+    #cv.imshow("out", output_frame)
+
     if cv.waitKey(1) & 0xFF == ord('q'):
         break
 
@@ -46,4 +54,3 @@ while frame_count < max_frames:
 cap.release()
 out.release()
 cv.destroyAllWindows()
-
