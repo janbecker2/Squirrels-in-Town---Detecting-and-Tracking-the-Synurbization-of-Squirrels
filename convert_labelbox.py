@@ -93,5 +93,4 @@ for item in data:
 with open(os.path.join(output_base, "classes.txt"), "w") as f:
     for name, idx in sorted(class_map.items(), key=lambda x: x[1]):
         f.write(f"{name}\n")
-
 print("Done")
