@@ -18,10 +18,19 @@ model = YOLO("yolo11n.pt")
 #     name="squirrel_model"
 # )
 
-model = YOLO(r"runs/detect/squirrel_model2/weights/best.pt")
-video_path = r"C:\Users\job02\Documents\Hoernchen\study_project_ws25_26\study_project_ws25_26\20241108_TrepS_01_in (2)_cut_updated.mp4"
+model = YOLO(r"runs/detect/squirrel_model2/weights/squirrelrightclasses.pt")
+video_path = r"C:\Users\job02\Documents\Hoernchen\study_project_ws25_26\study_project_ws25_26\v5.mp4"
 #video_outside_path = r"C:\Users\job02\Documents\Squirrel_Videos\outside\20241030_TrepN_04_out (8)_short.mp4"
-#output_path = r"C:\Users\job02\Downloads\squirrel_small_yolo_output_ouside.mp4"
+output_path = r"C:\Users\job02\Documents\Hoernchen\squirrel_yolo_output_dico_nuts.mp4"
+
+# print(model.names)
+# model.model.names[0] = "cup_full"
+# model.model.names[1] = "squirrel"
+# model.model.names[2] = "nut"
+# model.model.names[3] = "cup_empty"
+# model.model.names[4] = "disco_ball"
+
+# model.save('runs\detect\squirrel_model2\weights\squirrelrightclasses.pt')
 
 cap = cv.VideoCapture(video_path)
 fps = cap.get(cv.CAP_PROP_FPS)
@@ -29,7 +38,7 @@ width = int(cap.get(cv.CAP_PROP_FRAME_WIDTH))
 height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
 
 fourcc = cv.VideoWriter_fourcc(*"mp4v")
-#out = cv.VideoWriter(output_path, fourcc, fps, (width, height))
+out = cv.VideoWriter(output_path, fourcc, fps, (width, height))
 
 #max_frames = int(fps * 30)
 frame_count = 0
@@ -50,10 +59,10 @@ while True:
         output_frame = results[0].plot()
 
     # Write every frame
-    #out.write(output_frame)
+    out.write(output_frame)
 
     # Debug:
-    cv.imshow("out", output_frame)
+    #cv.imshow("out", output_frame)
 
     if cv.waitKey(1) & 0xFF == ord('q'):
         break
@@ -61,5 +70,5 @@ while True:
     frame_count += 1
 
 cap.release()
-#out.release()
+out.release()
 cv.destroyAllWindows()
