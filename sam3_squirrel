@@ -1,0 +1,77 @@
+from huggingface_hub import login
+import torch
+import torchvision
+print("PyTorch version:", torch.__version__)
+print("Torchvision version:", torchvision.__version__)
+print("CUDA is available:", torch.cuda.is_available())
+from dotenv import load_dotenv
+import os
+import sam3
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+
+load_dotenv(override=True)
+tokenValue = os.getenv("API_TOKEN")
+login(token = tokenValue)
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print(device)
+video_predictor = sam3.model_builder.build_sam3_video_predictor()
+video_predictor.model = video_predictor.model.to(device)
+video_path = "F:/Outside4.mp4" # a JPEG folder or an MP4 video file
+
+response = video_predictor.handle_request(
+    request=dict(
+        type="start_session",
+        resource_path=video_path,
+    )
+)
+
+# Check if session_id exists in response
+if "session_id" not in response:
+    print("ERROR: 'session_id' not found in response")
+    print("Available keys:", list(response.keys()) if hasattr(response, 'keys') else "N/A")
+    exit(1)
+
+session_id = response["session_id"]
+print(f"Session ID: {session_id}")
+
+response = video_predictor.handle_request(
+    request=dict(
+        type="add_prompt",
+        session_id=session_id,
+        frame_index=0,  # Add prompt to first frame
+        text="squirrel",
+    )
+)
+
+propagation_generator = video_predictor.handle_stream_request(
+    request=dict(
+        type="propagate_in_video",
+        session_id=session_id
+    )
+)
+all_masks = {}  # frame_index -> mask
+
+with torch.inference_mode():
+    for frame_result in propagation_generator:
+        frame_idx = frame_result["frame_index"]
+        outputs = frame_result["outputs"]
+
+        masks = outputs["masks"]  # ← key SAM-3 uses
+
+        # Torch → NumPy
+        if isinstance(masks, torch.Tensor):
+            masks = masks.detach().cpu().numpy()
+
+        # If multiple masks, merge into one
+        if masks.ndim == 3:        # (N, H, W)
+            mask = masks.any(axis=0)
+        else:                      # (H, W)
+            mask = masks.astype(bool)
+
+        all_masks[frame_idx] = mask
+
+        if frame_idx % 30 == 0:
+            print(f"Extracted mask for frame {frame_idx}")

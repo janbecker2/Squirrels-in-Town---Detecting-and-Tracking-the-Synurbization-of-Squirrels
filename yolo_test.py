@@ -10,13 +10,15 @@ model = YOLO("yolo11n.pt")
 # name="squirrel_yolo11" 
 # )
 
-# model.train(
-#     data=r"yolo_dataset_from_labelbox_squirrel\data.yaml",
-#     epochs=1,
-#     imgsz=640,
-#     batch=8,
-#     name="squirrel_model"
-# )
+model.train(
+    data=r"yolo_dataset_from_labelbox_squirrel\data.yaml",
+    epochs=50,
+    imgsz=640,
+    batch=8,
+    workers=8,
+    cache=True,
+    name="squirrel_model_big"
+)
 
 model = YOLO(r"runs/detect/squirrel_model2/weights/squirrelrightclasses.pt")
 video_path = r"C:\Users\job02\Documents\Hoernchen\study_project_ws25_26\study_project_ws25_26\v5.mp4"
@@ -32,43 +34,43 @@ output_path = r"C:\Users\job02\Documents\Hoernchen\squirrel_yolo_output_dico_nut
 
 # model.save('runs\detect\squirrel_model2\weights\squirrelrightclasses.pt')
 
-cap = cv.VideoCapture(video_path)
-fps = cap.get(cv.CAP_PROP_FPS)
-width = int(cap.get(cv.CAP_PROP_FRAME_WIDTH))
-height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
+# cap = cv.VideoCapture(video_path)
+# fps = cap.get(cv.CAP_PROP_FPS)
+# width = int(cap.get(cv.CAP_PROP_FRAME_WIDTH))
+# height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
 
-fourcc = cv.VideoWriter_fourcc(*"mp4v")
-out = cv.VideoWriter(output_path, fourcc, fps, (width, height))
+# fourcc = cv.VideoWriter_fourcc(*"mp4v")
+# out = cv.VideoWriter(output_path, fourcc, fps, (width, height))
 
-#max_frames = int(fps * 30)
-frame_count = 0
+# #max_frames = int(fps * 30)
+# frame_count = 0
 
-#while frame_count < max_frames:
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        break
+# #while frame_count < max_frames:
+# while True:
+#     ret, frame = cap.read()
+#     if not ret:
+#         break
 
-    results = model(frame, conf=0.3)
+#     results = model(frame, conf=0.3)
 
-    # Always start with the original frame
-    output_frame = frame.copy()
+#     # Always start with the original frame
+#     output_frame = frame.copy()
 
-    # Draw detections only if present
-    if len(results) > 0:
-        output_frame = results[0].plot()
+#     # Draw detections only if present
+#     if len(results) > 0:
+#         output_frame = results[0].plot()
 
-    # Write every frame
-    out.write(output_frame)
+#     # Write every frame
+#     out.write(output_frame)
 
-    # Debug:
-    #cv.imshow("out", output_frame)
+#     # Debug:
+#     #cv.imshow("out", output_frame)
 
-    if cv.waitKey(1) & 0xFF == ord('q'):
-        break
+#     if cv.waitKey(1) & 0xFF == ord('q'):
+#         break
 
-    frame_count += 1
+#     frame_count += 1
 
-cap.release()
-out.release()
-cv.destroyAllWindows()
+# cap.release()
+# out.release()
+# cv.destroyAllWindows()
