@@ -23,10 +23,9 @@ processor = Sam3VideoProcessor.from_pretrained(MODEL_ID)
 
 print("Successfully loaded models.")
 
-MAX_SECONDS = 8.0
-
 from transformers.video_utils import load_video
 video_url = "F:/Outside4.mp4"
+video_frames_original_size, _ = load_video(video_url)
 video_frames, _ = load_video(video_url)
 
 TARGET_SIZE = 512  # z.B. 512 oder 640
@@ -57,8 +56,10 @@ processor.add_text_prompt(
     inference_session=inference_session,
     text=text_prompt,
 )
+
 print(type(video_frames))
 print(type(inference_session))
+
 def showSingleFrame(inference_session, video_frames, frame_idx):
     model_outputs = model(
         inference_session=inference_session,
@@ -92,7 +93,7 @@ def showWholeVideo(inference_session, video_frames, output_path=None):
         writer = cv.VideoWriter(
             output_path,
             cv.VideoWriter_fourcc(*"mp4v"),
-            25,  # FPS
+            30,  # FPS
             (w, h)
         )
 
