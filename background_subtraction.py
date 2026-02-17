@@ -48,7 +48,6 @@ def readVideo_BGSub(videoName):
     # Reset video stream to beginning
     cap.set(cv.CAP_PROP_POS_FRAMES, 0)
 
-    # ---- Main Loop ----
     while True:
         ret, frame = cap.read()
         if not ret:
